@@ -36,7 +36,6 @@ export default function EventApp() {
       );
 
       setContract(eventContract);
-
       const ownerAddress = await eventContract.owner();
       setOwner(ownerAddress);
 
@@ -104,75 +103,94 @@ export default function EventApp() {
   };
 
   return (
-    <div className="p-5">
-      <h2>
-        Connecté en tant que : {account}{" "}
-        {account.toLowerCase() === owner.toLowerCase() && (
-          <span style={{ color: "green" }}>(Admin)</span>
-        )}
-      </h2>
+    <div className="max-w-3xl mx-auto p-6">
+      <h1 className="text-3xl font-bold text-center mb-6">
+        DApp Réservation d'Événements
+      </h1>
 
-      {/* Formulaire pour l'admin */}
+      <div className="mb-6 bg-gray-100 p-4 rounded shadow">
+        <p className="text-sm text-gray-600">
+          Connecté en tant que :
+          <span className="font-mono text-blue-600 ml-2">
+            {account || "Aucun"}
+          </span>
+          {account.toLowerCase() === owner.toLowerCase() && (
+            <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded">
+              Admin
+            </span>
+          )}
+        </p>
+      </div>
+
       {account.toLowerCase() === owner.toLowerCase() && (
-        <div
-          style={{
-            marginBottom: "20px",
-            border: "1px solid #ccc",
-            padding: "10px",
-          }}
-        >
-          <h3>Créer un nouvel événement</h3>
-          <input
-            type="text"
-            placeholder="Nom de l'événement"
-            value={newEventName}
-            onChange={(e) => setNewEventName(e.target.value)}
-            style={{ marginRight: "10px" }}
-          />
-          <input
-            type="number"
-            placeholder="Capacité"
-            value={newEventCapacity}
-            onChange={(e) => setNewEventCapacity(e.target.value)}
-            style={{ marginRight: "10px" }}
-          />
-          <button onClick={handleCreateEvent}>Créer</button>
+        <div className="mb-8 p-4 bg-white shadow rounded border border-gray-200">
+          <h2 className="text-lg font-semibold mb-4">Créer un événement</h2>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              type="text"
+              placeholder="Nom de l'événement"
+              value={newEventName}
+              onChange={(e) => setNewEventName(e.target.value)}
+              className="border p-2 rounded w-full sm:w-1/2"
+            />
+            <input
+              type="number"
+              placeholder="Capacité"
+              value={newEventCapacity}
+              onChange={(e) => setNewEventCapacity(e.target.value)}
+              className="border p-2 rounded w-full sm:w-1/3"
+            />
+            <button
+              onClick={handleCreateEvent}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Créer
+            </button>
+          </div>
         </div>
       )}
 
-      <h3>Événements disponibles :</h3>
-      {events.length === 0 && <p>Aucun événement trouvé.</p>}
-      {events.map((ev) => (
-        <div
-          key={ev.id}
-          style={{
-            border: "1px solid gray",
-            padding: "10px",
-            marginBottom: "10px",
-          }}
-        >
-          <p>
-            <strong>{ev.name}</strong>
-          </p>
-          <p>Capacité : {ev.capacity}</p>
-          <p>
-            Places restantes : {parseInt(ev.capacity) - parseInt(ev.registered)}
-          </p>
-
-          <button
-            onClick={() => handleReserve(ev.id)}
-            disabled={
-              ev.reserved || parseInt(ev.registered) >= parseInt(ev.capacity)
-            }
-          >
-            {ev.reserved
-              ? "Déjà réservé"
-              : parseInt(ev.registered) >= parseInt(ev.capacity)
-              ? "Complet"
-              : "Réserver"}
-          </button>
+      <h2 className="text-xl font-semibold mb-4">Événements disponibles</h2>
+      {events.length === 0 ? (
+        <p className="text-gray-600">Aucun événement trouvé.</p>
+      ) : (
+        <div className="space-y-4">
+          {events.map((ev) => (
+            <div
+              key={ev.id}
+              className="border p-4 rounded bg-white shadow-sm flex flex-col sm:flex-row sm:items-center justify-between"
+            >
+              <div>
+                <p className="text-lg font-bold">{ev.name}</p>
+                <p className="text-sm text-gray-600">
+                  Capacité : {ev.capacity} —{" "}
+                  {parseInt(ev.capacity) - parseInt(ev.registered)} places
+                  restantes
+                </p>
+              </div>
+              <button
+                onClick={() => handleReserve(ev.id)}
+                disabled={
+                  ev.reserved ||
+                  parseInt(ev.registered) >= parseInt(ev.capacity)
+                }
+                className={`mt-2 sm:mt-0 px-4 py-2 rounded text-white font-semibold ${
+                  ev.reserved ||
+                  parseInt(ev.registered) >= parseInt(ev.capacity)
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
+                }`}
+              >
+                {ev.reserved
+                  ? "Déjà réservé"
+                  : parseInt(ev.registered) >= parseInt(ev.capacity)
+                  ? "Complet"
+                  : "Réserver"}
+              </button>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }
